@@ -1,5 +1,6 @@
 require 'facebook/messenger'
 require 'httparty'
+require 'addressable/uri'
 require 'json'
 include Facebook::Messenger
 require_relative 'persistent_menu'
@@ -14,11 +15,13 @@ IDIOMS = {
   route: ["camino del leon a enfermeria","ruta del liq a facultad de ingenieria","caminar de enfermeria a aulas","lleveme de aulas al cyt"]
 }
 
+WITHOUT_ANSWERS = ["ok","genail","bacano"]
+
 NONE = ["Lo siento pero no te entendi","el problema es realmente duro, intentalo formular de otra manera","no se","me corchaste"]
 GREETINGS = {
-  greet: ["hola", "hi", "hello","hey"],
-  about: ["bien, como vas", "bien, como has estado", "bien, que tal la u","bien, que tal la vida","bien, como van las cosas"],
-  about_doing: ["esperando para resolverte cualquier duda o problema que tengas \n que haces","he estado esperando, pero ahora estoy feliz porque ya pude conocerte, \n que has hecho","tengo planeado ponerme a tu disposicion para solucionar cualquier duda que tengas \n que tienes planeado"]
+  greet: ["hola\n", "hi\n", "hello\n","hey\n"],
+  about: ["bien, como vas\n", "bien, como has estado\n", "bien, que tal la u","bien, que tal la vida\n","bien, como van las cosas\n","genial, tu\n"],
+  about_doing: ["esperando para resolverte cualquier duda o problema que tengas \nque haces","he estado esperando, pero ahora estoy feliz porque ya pude conocerte, \nque has hecho","tengo planeado ponerme a tu disposicion para solucionar cualquier duda que tengas \nque tienes planeado"]
 }
 
 MENU_REPLIES = [
@@ -79,28 +82,32 @@ end
 
 def way_for_any_input
   Bot.on :message do |message|
-    if message.text == "Informacion"
-       message.reply(text: "Como por ejemplo: "+ IDIOMS[:general].sample)
-    elsif message.text == "Rutas"
-      message.reply(text: "Podrias preguntar: " + IDIOMS[:route].sample)
-    elsif message.text == "Localizacion"
-      message.reply(text: "Yo puedo responder: " + IDIOMS[:position].sample)
-    else
-      result = unbot(message.text)
-      p result
-      p result["topScoringIntent"]["intent"]
-      case result["topScoringIntent"]["intent"]
-      when "Greeting"
-        show_replies_menu(message.sender['id'],MENU_REPLIES,result["entities"])
-      when "LocateBuilding"
-        handle_location_building(message,result[:entities])
-      when "Route"
-        handle_route(message,result[:entities])
-      when "ShowInformation"
-        handle_information(message,result[:entities])
+    if is_text_message?(message)
+      if message.text == "Informacion"
+         message.reply(text: "Como por ejemplo: "+ IDIOMS[:general].sample)
+      elsif message.text == "Rutas"
+        message.reply(text: "Podrias preguntar: " + IDIOMS[:route].sample)
+      elsif message.text == "Localizacion"
+        message.reply(text: "Yo puedo responder: " + IDIOMS[:position].sample)
       else
-        show_replies_menu_none
+        result = unbot(message.text)
+        p result
+        p result["topScoringIntent"]["intent"]
+        case result["topScoringIntent"]["intent"]
+        when "Greeting"
+          show_replies_menu(message.sender['id'],MENU_REPLIES,result["entities"])
+        when "LocateBuilding"
+          handle_location_building(message,result[:entities])
+        when "Route"
+          handle_route(message,result[:entities])
+        when "ShowInformation"
+          handle_information(message,result[:entities])
+        else
+          show_replies_menu_none(message.sender['id'])
+        end
       end
+    else
+      message.reply(text: "Necesitamos un texto para poder trabajar")
     end
   end
 end
@@ -112,15 +119,38 @@ def show_replies_menu_none(id)
 end
 
 def show_replies_menu(id,menu,entities)
-
+  greet = true
+  about = true
+  about_doing = true
+  without_answer = true
   if entities != nil && !entities.empty?
     text = ""
     entities.each do |a|
-      if a["type"] != "without_answer"
-        x = a["type"]
-        text = text + GREETINGS[x.to_sym].sample + ""
-      else
-        text = text + "ok"
+      if a["type"] == "greet" && greet
+        text = text + GREETINGS[:greet].sample + ""
+        greet = false
+        break
+      end
+    end
+    entities.each do |a|
+      if a["type"] == "about" && about
+        text = text + GREETINGS[:about].sample + ""
+        about = false
+        break
+      end
+    end
+    entities.each do |a|
+      if a["type"] == "about_doing" && about_doing
+        text = text + GREETINGS[:about_doing].sample + ""
+        about_doing = false
+        break
+      end
+    end
+    entities.each do |a|
+      if a["type"] == "without_answer" && without_answer
+        text = text + WITHOUT_ANSWERS.sample + ""
+        without_answer = false
+        break
       end
     end
   else
@@ -131,21 +161,31 @@ def show_replies_menu(id,menu,entities)
 end
 
 def handle_location_building(message,entities)
+  message.reply(text: "En este momento estamos trabajando para darte respuesta a esta pregunta")
   way_for_any_input
 end
 
 def handle_route(message,entities)
+  message.reply(text: "En este momento estamos trabajando para darte respuesta a esta pregunta")
   way_for_any_input
 end
 
 def handle_information(message,entities)
+  message.reply(text: "En este momento estamos trabajando para darte respuesta a esta pregunta")
   way_for_any_input
 end
 
 def unbot(message)
-  response = HTTParty.get(UNBOT+message)
+  response = HTTParty.get(UNBOT+encode_ascii(message))
   parsed = JSON.parse(response.body)
+end
 
+def encode_ascii(s)
+  Addressable::URI.parse(s).normalize.to_s
+end
+
+def is_text_message?(message)
+  !message.text.nil?
 end
 
 way_for_any_input
