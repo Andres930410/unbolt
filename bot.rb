@@ -5,7 +5,6 @@ require 'json'
 require_relative 'persistent_menu'
 include Facebook::Messenger
 
-
 # Subcribe bot to your page
 Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
 PersistentMenu.enable
