@@ -1,3 +1,5 @@
+include Facebook::Messenger
+
 class PersistentMenu
   def self.enable
     # Create persistent menu
