@@ -3,9 +3,10 @@ include Facebook::Messenger
 class PersistentMenu
   def self.enable
     # Create persistent menu
-    Facebook::Messenger::Thread.set({
-      setting_type: 'call_to_actions',
-      thread_state: 'existing_thread',
+    Facebook::Messenger::Profile.set({
+    persistent_menu: [
+      locale: 'default',
+      composer_input_disabled: true,
       call_to_actions: [
         {
           type: 'postback',
@@ -23,6 +24,7 @@ class PersistentMenu
           payload: 'LOCATION'
         }
       ]
+    ]
     }, access_token: ENV['ACCESS_TOKEN'])
   end
 end
