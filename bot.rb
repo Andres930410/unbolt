@@ -2,11 +2,13 @@ require 'facebook/messenger'
 require 'httparty'
 require 'addressable/uri'
 require 'json'
-include Facebook::Messenger
 require_relative 'persistent_menu'
+include Facebook::Messenger
+
 
 # Subcribe bot to your page
 Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
+PersistentMenu.enable
 
 UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=21cc724246db40e0bbf9dd0fd9817432&timezoneOffset=0&verbose=true&q="
 IDIOMS = {
