@@ -10,7 +10,7 @@ Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
 UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=21cc724246db40e0bbf9dd0fd9817432&timezoneOffset=0&verbose=true&q="
 IDIOMS = {
   general: ["Cuantos años tiene el cyt","historia del viejo","cuando fue fundado enfermeria","apodo del 401","numero del liq", "quien es julio zorra"],
-  position: ["Donde que el viejo","ubicacion de enfermeria","coordenadas de aulas","por donde es el polideportivo","por que lado es el 401"],
+  position: ["Donde queda el viejo","ubicacion de enfermeria","coordenadas de aulas","por donde es el polideportivo","por que lado es el 401"],
   route: ["camino del leon a enfermeria","ruta del liq a facultad de ingenieria","caminar de enfermeria a aulas","lleveme de aulas al cyt"]
 }
 
@@ -94,7 +94,18 @@ def way_for_any_input
         p result["topScoringIntent"]["intent"]
         case result["topScoringIntent"]["intent"]
         when "Greeting"
-          show_replies_menu(message.sender['id'],MENU_REPLIES,result["entities"])
+          v = true
+          result["entities"].each do |a|
+            if a["type"] == "what"
+              v = false
+              break
+            end
+           end
+           if v
+             show_replies_menu(message.sender['id'],MENU_REPLIES,result["entities"])
+           else
+             show_replies_menu_what(message.sender['id'],MENU_REPLIES)
+           end
         when "LocateBuilding"
           handle_location_building(message,result[:entities])
         when "Route"
@@ -102,7 +113,7 @@ def way_for_any_input
         when "ShowInformation"
           handle_information(message,result[:entities])
         else
-          show_replies_menu_none(message.sender['id'])
+          show_replies_menu_none(message.sender['id'],MENU_REPLIES)
         end
       end
     else
@@ -111,9 +122,15 @@ def way_for_any_input
   end
 end
 
-def show_replies_menu_none(id)
-  text = NONE.sample
-  say(id,text)
+def show_replies_menu_none(id,menu)
+  text = "Selecciona alguna opcion para que veas de lo que soy capaz"
+  say(id,text,menu)
+  way_for_any_input
+end
+
+def show_replies_menu_what(id,menu)
+  text = "Seleciona alguno de los botones para que veas de lo que soy capaz"
+  say(id,text,menu)
   way_for_any_input
 end
 
