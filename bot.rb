@@ -90,8 +90,6 @@ def way_for_any_input
         message.reply(text: "Yo puedo responder: " + IDIOMS[:position].sample)
       else
         result = unbot(message.text)
-        p result
-        p result["topScoringIntent"]["intent"]
         case result["topScoringIntent"]["intent"]
         when "Greeting"
           v = true
