@@ -187,7 +187,7 @@ def handle_location_building(message,id,entities)
       attachment: {
         type: 'image',
         payload: {
-          url: HOST + result["result"]["data"]["image"]["url"]
+          url: result["result"]["data"]["image"]["url"]
         }
       }
     )
