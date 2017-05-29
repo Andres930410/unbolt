@@ -176,7 +176,8 @@ def show_replies_menu(id,menu,entities)
 end
 
 def handle_location_building(id,entities)
-  result = HTTParty.post(BACK,:body => {data: entities},
+  p entities
+  result = HTTParty.post(BACK,:body => {data: [entities],
     :headers => { 'Content-Type' => 'application/json' })
   say(id,"hola")
   way_for_any_input
