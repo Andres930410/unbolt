@@ -182,7 +182,8 @@ def handle_location_building(message,id,entities)
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
   if result["result"]["status"] == "ok"
-    say(id,"el edificio puede ser encontrado aqui")
+    url = "https://www.google.com/maps/search/?api=1&query=#{result["result"]["data"]["lat"]},#{result["result"]["data"]["lng"]}"
+    say(id,"el edificio puede ser encontrado aqui\n#{url}")
     message.reply(
       attachment: {
         type: 'image',
