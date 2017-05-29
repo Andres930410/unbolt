@@ -183,7 +183,6 @@ def handle_location_building(message,id,entities)
     :headers => { 'Content-Type' => 'application/json' } )
   if result["result"]["status"] == "ok"
     say(id,"el edificio puede ser encontrado aqui")
-
     message.reply(
       attachment: {
         type: 'image',
