@@ -180,6 +180,7 @@ def handle_location_building(id,entities)
                :data => entities
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
+  p result
   say(id,"hola")
   way_for_any_input
 end
