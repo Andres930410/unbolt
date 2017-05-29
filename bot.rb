@@ -177,7 +177,7 @@ end
 
 def handle_location_building(id,entities)
   p entities
-  result = HTTParty.post(BACK,:body => {data: entities},
+  result = HTTParty.post(BACK,:body => {entities}.to_json,
     :headers => { 'Content-Type' => 'application/json' })
   say(id,"hola")
   way_for_any_input
