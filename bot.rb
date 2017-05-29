@@ -7,7 +7,8 @@ include Facebook::Messenger
 # Subcribe bot to your page
 Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
 
-UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=21cc724246db40e0bbf9dd0fd9817432&timezoneOffset=0&verbose=true&q="
+UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=abc4177072b9452ead3d335addb94ede&timezoneOffset=0&verbose=true&q="
+BACK = "https://unbotback.herokuapp.com/buildings/location"
 IDIOMS = {
   general: ["Cuantos años tiene el cyt","historia del viejo","cuando fue fundado enfermeria","apodo del 401","numero del liq", "quien es julio zorra"],
   position: ["Donde queda el viejo","ubicacion de enfermeria","coordenadas de aulas","por donde es el polideportivo","por que lado es el 401"],
@@ -101,11 +102,11 @@ def way_for_any_input
            end
            if v
              show_replies_menu(message.sender['id'],MENU_REPLIES,result["entities"])
-           else
+             else
              show_replies_menu_what(message.sender['id'],MENU_REPLIES)
            end
         when "LocateBuilding"
-          handle_location_building(message,result[:entities])
+          handle_location_building(message.sender['id'],result[:entities])
         when "Route"
           handle_route(message,result[:entities])
         when "ShowInformation"
@@ -174,8 +175,10 @@ def show_replies_menu(id,menu,entities)
   way_for_any_input
 end
 
-def handle_location_building(message,entities)
-  message.reply(text: "En este momento estamos trabajando para darte respuesta a esta pregunta")
+def handle_location_building(id,entities)
+  result = HTTParty.post(BACK,:body => {data: entities},
+    :headers => { 'Content-Type' => 'application/json' })
+  say(id,"hola")
   way_for_any_input
 end
 
