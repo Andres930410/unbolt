@@ -223,6 +223,7 @@ def handle_information(message,entities)
                :data => entities
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
+  p result
   if result["result"]["status"] == "ok"
     message.reply(text: result["result"]["message"])
   else
