@@ -106,9 +106,9 @@ def way_for_any_input
              show_replies_menu_what(message.sender['id'],MENU_REPLIES)
            end
         when "LocateBuilding"
-          handle_location_building(message.sender['id'],result[:entities])
+          handle_location_building(message.sender['id'],result["entities"])
         when "Route"
-          handle_route(message,result[:entities])
+          handle_route(message,result["entities"])
         when "ShowInformation"
           handle_information(message,result[:entities])
         else
@@ -177,7 +177,7 @@ end
 
 def handle_location_building(id,entities)
   p entities
-  result = HTTParty.post(BACK,:body => {data: [entities]},
+  result = HTTParty.post(BACK,:body => {data: entities},
     :headers => { 'Content-Type' => 'application/json' })
   say(id,"hola")
   way_for_any_input
