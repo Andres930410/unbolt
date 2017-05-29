@@ -10,6 +10,7 @@ Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
 UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=abc4177072b9452ead3d335addb94ede&timezoneOffset=0&verbose=true&q="
 BACK = "https://unbotback.herokuapp.com/buildings/location"
 BACK_INFORMATION = "https://unbotback.herokuapp.com/buildings/information"
+BACK_ROUTE = "https://unbotback.herokuapp.com/buildings/route"
 HOST = "https://unbotback.herokuapp.com"
 IDIOMS = {
   general: ["Cuantos años tiene el cyt","historia del viejo","cuando fue fundado enfermeria","apodo del 401","numero del liq", "quien es julio zorra"],
@@ -200,7 +201,15 @@ def handle_location_building(message,id,entities)
 end
 
 def handle_route(message,entities)
-  message.reply(text: "En este momento estamos trabajando para darte respuesta a esta pregunta")
+  result = HTTParty.post(BACK_ROUTE,:body => {
+               :data => entities
+             }.to_json,
+    :headers => { 'Content-Type' => 'application/json' } )
+  if result["result"]["status"] == "ok"
+    message.reply(text: "Aqui te mostramos una forma en la que puedes llegar a tu destion\n"+result["result"]["message"])
+  else
+    message.reply(text: "No encontramos ninguna ruta entre los dos puntos")
+  end
   way_for_any_input
 end
 
