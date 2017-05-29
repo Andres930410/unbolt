@@ -9,6 +9,7 @@ Facebook::Messenger::Subscriptions.subscribe(access_token: ENV["ACCESS_TOKEN"])
 
 UNBOT = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ae7007ff-6b7d-4f73-be7a-cb26e2802087?subscription-key=abc4177072b9452ead3d335addb94ede&timezoneOffset=0&verbose=true&q="
 BACK = "https://unbotback.herokuapp.com/buildings/location"
+HOST = "https://unbotback.herokuapp.com"
 IDIOMS = {
   general: ["Cuantos años tiene el cyt","historia del viejo","cuando fue fundado enfermeria","apodo del 401","numero del liq", "quien es julio zorra"],
   position: ["Donde queda el viejo","ubicacion de enfermeria","coordenadas de aulas","por donde es el polideportivo","por que lado es el 401"],
@@ -106,7 +107,7 @@ def way_for_any_input
              show_replies_menu_what(message.sender['id'],MENU_REPLIES)
            end
         when "LocateBuilding"
-          handle_location_building(message.sender['id'],result["entities"])
+          handle_location_building(message,message.sender['id'],result["entities"])
         when "Route"
           handle_route(message,result["entities"])
         when "ShowInformation"
@@ -175,13 +176,24 @@ def show_replies_menu(id,menu,entities)
   way_for_any_input
 end
 
-def handle_location_building(id,entities)
+def handle_location_building(message,id,entities)
   result = HTTParty.post(BACK,:body => {
                :data => entities
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
-  p result
-  say(id,"hola")
+  if result["result"]["status"] == "ok"
+    message.reply(
+    text: "Este es el lugar donde puedes encontrar aulas",
+    attachment: {
+      type: 'image',
+      payload: {
+        url: HOST + result["result"]["data"]["image"]["url"]
+      }
+    }
+  )
+  else
+    say(id,"No encontramos informacion correspondiente a este edificio")
+  end
   way_for_any_input
 end
 
