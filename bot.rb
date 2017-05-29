@@ -182,15 +182,16 @@ def handle_location_building(message,id,entities)
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
   if result["result"]["status"] == "ok"
+    say(id,"el edificio puede ser encontrado aqui")
+
     message.reply(
-    text: "Este es el lugar donde puedes encontrar aulas",
-    attachment: {
-      type: 'image',
-      payload: {
-        url: HOST + result["result"]["data"]["image"]["url"]
+      attachment: {
+        type: 'image',
+        payload: {
+          url: HOST + result["result"]["data"]["image"]["url"]
+        }
       }
-    }
-  )
+    )
   else
     say(id,"No encontramos informacion correspondiente a este edificio")
   end
