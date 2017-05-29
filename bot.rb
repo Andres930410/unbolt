@@ -19,8 +19,11 @@ IDIOMS = {
 }
 
 WITHOUT_ANSWERS = ["ok","genail","bacano"]
+LOCALITATION = ["El edificio puede ser encontrado aqui","Mira donde esta el edifico","Espero que esto te pueda ubicar mejor","No es tan dificil aqui esta el edificio","Este mapa te puede ayudar"]
+ROUTE = ["Aqui te mostramos una forma en la que puedes llegar a tu destino","Que tal este camino","Porque no sigues esta ruta","Intenta esto"]
 
 NONE = ["Lo siento pero no te entendi","el problema es realmente duro, intentalo formular de otra manera","no se","me corchaste"]
+NONE_BUILDING = ["Lo siento, no se","Me conrchaste","Intente preguntar por otra cosa","No tengo informacion acerca del edificio","No se como solucionar lo que preguntaste","No tengo informacion pero sigue intentando tal vez en el futuro pueda responderte",":p, no se, investigare para responderte"]
 GREETINGS = {
   greet: ["hola\n", "hi\n", "hello\n","hey\n"],
   about: ["bien, como vas\n", "bien, como has estado\n", "bien, que tal la u","bien, que tal la vida\n","bien, como van las cosas\n","genial, tu\n"],
@@ -185,7 +188,7 @@ def handle_location_building(message,id,entities)
     :headers => { 'Content-Type' => 'application/json' } )
   if result["result"]["status"] == "ok"
     url = "https://www.google.com/maps/search/?api=1&query=#{result["result"]["data"]["lat"]},#{result["result"]["data"]["lng"]}"
-    say(id,"el edificio puede ser encontrado aqui\n#{url}")
+    say(id,"#{LOCALITATION.sample}\n#{url}")
     message.reply(
       attachment: {
         type: 'image',
@@ -195,7 +198,7 @@ def handle_location_building(message,id,entities)
       }
     )
   else
-    say(id,"No encontramos informacion correspondiente a este edificio")
+    say(id,NONE_BUILDING.sample)
   end
   way_for_any_input
 end
@@ -206,9 +209,9 @@ def handle_route(message,entities)
              }.to_json,
     :headers => { 'Content-Type' => 'application/json' } )
   if result["result"]["status"] == "ok"
-    message.reply(text: "Aqui te mostramos una forma en la que puedes llegar a tu destion\n"+result["result"]["message"])
+    message.reply(text: "#{ROUTE.sample}  \n"+result["result"]["message"])
   else
-    message.reply(text: "No encontramos ninguna ruta entre los dos puntos")
+    message.reply(text: NONE_BUILDING.sample)
   end
   way_for_any_input
 end
@@ -221,7 +224,7 @@ def handle_information(message,entities)
   if result["result"]["status"] == "ok"
     message.reply(text: result["result"]["message"])
   else
-    message.reply(text: "No encontramos informacion para poder responder tu pregunta")
+    message.reply(text: NONE_BUILDING.sample)
   end
   way_for_any_input
 end
