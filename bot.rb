@@ -96,7 +96,9 @@ def way_for_any_input
       elsif message.text == "Localizacion"
         message.reply(text: "Yo puedo responder: " + IDIOMS[:position].sample)
       else
-        result = unbot(message.text)
+        a = message.text
+        a.slice!("#")
+        result = unbot(a)
         case result["topScoringIntent"]["intent"]
         when "Greeting"
           v = true
